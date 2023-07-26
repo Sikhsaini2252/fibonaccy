@@ -1,0 +1,138 @@
+
+
+
+
+class FoodItem:
+    def _init_(self, name, quantity, price, discount, stock):
+        self.food_id = None
+        self.name = name
+        self.quantity = quantity
+        self.price = price
+        self.discount = discount
+        self.stock = stock
+class User:
+    def _init_(self, full_name, phone_number, email, address, password):
+        self.full_name = full_name
+        self.phone_number = phone_number
+        self.email = email
+        self.address = address
+        self.password = password
+        self.orders = []
+class FoodOrderingApp:
+    def _init_(self):
+        self.admin_logged_in = False
+        self.users = {}
+        self.food_items = {}
+        self.food_id_counter = 1
+    def admin_login(self, password):
+        # Replace with your admin password validation logic
+        if password == "admin123":
+            self.admin_logged_in = True
+            print("Admin logged in successfully!")
+        else:
+            print("Invalid password. Admin login failed.")
+    def admin_logout(self):
+        self.admin_logged_in = False
+        print("Admin logged out.")
+    def add_food_item(self, name, quantity, price, discount, stock):
+        food_item = FoodItem(name, quantity, price, discount, stock)
+        food_item.food_id = self.food_id_counter
+        self.food_items[self.food_id_counter] = food_item
+        self.food_id_counter += 1
+        print("Food item added successfully!")
+    def edit_food_item(self, food_id, name, quantity, price, discount, stock):
+        if food_id in self.food_items:
+            food_item = self.food_items[food_id]
+            food_item.name = name
+            food_item.quantity = quantity
+            food_item.price = price
+            food_item.discount = discount
+            food_item.stock = stock
+            print(f"Food item with FoodID {food_id} edited successfully!")
+        else:
+            print(f"Food item with FoodID {food_id} not found.")
+    def view_all_food_items(self):
+        if not self.food_items:
+            print("No food items found.")
+        else:
+            print("List of all food items:")
+            for food_id, food_item in self.food_items.items():
+                print(f"FoodID: {food_id}, Name: {food_item.name}, Quantity: {food_item.quantity}, "
+                      f"Price: {food_item.price}, Discount: {food_item.discount}, Stock: {food_item.stock}")
+    def remove_food_item(self, food_id):
+        if food_id in self.food_items:
+            del self.food_items[food_id]
+            print(f"Food item with FoodID {food_id} removed successfully!")
+        else:
+            print(f"Food item with FoodID {food_id} not found.")
+    def user_register(self, full_name, phone_number, email, address, password):
+        if email in self.users:
+            print("Email already registered. Please log in.")
+        else:
+            user = User(full_name, phone_number, email, address, password)
+            self.users[email] = user
+            print("User registered successfully!")
+    def user_login(self, email, password):
+        if email in self.users:
+            user = self.users[email]
+            if user.password == password:
+                print("User logged in successfully!")
+                return user
+            else:
+                print("Invalid password. User login failed.")
+        else:
+            print("User not found. Please register first.")
+    def user_logout(self):
+        print("User logged out.")
+    def place_order(self, user, food_ids):
+        order_items = []
+        total_amount = 0
+        for food_id in food_ids:
+            if food_id in self.food_items:
+                food_item = self.food_items[food_id]
+                order_items.append(food_item)
+                total_amount += food_item.price - (food_item.price * food_item.discount / 100)
+        if not order_items:
+            print("No valid food items selected.")
+        else:
+            user.orders.append(order_items)
+            print("Order placed successfully!")
+            print("Your selected items:")
+            for item in order_items:
+                print(f"{item.name} ({item.quantity}) [INR {item.price}]")
+            print(f"Total Amount: INR {total_amount}")
+    def view_order_history(self, user):
+        if not user.orders:
+            print("No order history found.")
+        else:
+            print("Order History:")
+            for index, order_items in enumerate(user.orders, 1):
+                print(f"Order {index}:")
+                for item in order_items:
+                    print(f"{item.name} ({item.quantity}) [INR {item.price}]")
+    def update_user_profile(self, user, full_name, phone_number, address, password):
+        user.full_name = full_name
+        user.phone_number = phone_number
+        user.address = address
+        user.password = password
+        print("User profile updated successfully!")
+# Example usage
+app = FoodOrderingApp()
+# Admin functionality
+app.admin_login("admin123")
+app.add_food_item("Tandoori Chicken", "4 pieces", 240, 10, 50)
+app.add_food_item("Vegan Burger", "1 piece", 320, 15, 30)
+app.view_all_food_items()
+app.edit_food_item(1, "Tandoori Chicken", "6 pieces", 250, 10, 40)
+app.view_all_food_items()
+app.remove_food_item(2)
+app.view_all_food_items()
+app.admin_logout()
+# User functionality
+app.user_register("Himanshu saini", "1234567890", "Sikhsiani2252@gmail.com", "123 Main Street", "password123")
+user = app.user_login("sikhsaini2252@gmail.com", "password123")
+app.place_order(user, [1, 2])
+app.place_order(user, [3])  # Invalid food_id
+app.view_order_history(user)
+app.update_user_profile(user, "Himanshu saini", "9876543210", "456 Elm Street", "newpassword123")
+app.user_logout()
